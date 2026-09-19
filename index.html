@@ -1,0 +1,61 @@
+<!doctype html>
+<html lang="id">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Absensi Ekstrakurikuler | SMAN 1 Kota Gajah</title>
+<link rel="stylesheet" href="style.css">
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+<script src="https://unpkg.com/html5-qrcode" defer></script>
+</head>
+<body>
+<div class="app-shell">
+<aside class="sidebar" id="sidebar">
+  <div class="brand"><div class="brand-mark">S1</div><div><b>SMAN 1 Kota Gajah</b><small>Absensi Ekstrakurikuler</small></div></div>
+  <div class="side-label">MENU UTAMA</div>
+  <nav>
+    <button class="nav-btn active" data-view="dashboard">◈ <span>Dashboard</span></button>
+    <button class="nav-btn" data-view="siswa">▦ <span>Data Siswa</span></button>
+    <button class="nav-btn" data-view="absen">⌁ <span>Absen Ekstrakurikuler</span></button>
+    <button class="nav-btn" data-view="rekap">▤ <span>Rekap Absen</span></button>
+    <button class="nav-btn" data-view="grafik">◒ <span>Grafik</span></button>
+    <button class="nav-btn" data-view="pengaturan">⚙ <span>Pengaturan</span></button>
+  </nav>
+  <div class="creator">Created by Akhmad Khafidz K., S.Pd., Gr.</div>
+</aside>
+<main class="main">
+<header class="topbar"><button id="menuBtn" class="icon-btn">☰</button><div><h1 id="pageTitle">Dashboard</h1><p>Absensi Ekstrakurikuler • SMAN 1 Kota Gajah</p></div><span id="apiBadge" class="badge warn">API belum disetel</span></header>
+
+<section id="view-dashboard" class="view active">
+  <div class="hero"><div><span class="eyebrow">SMART SCHOOL ATTENDANCE</span><h2>Kelola kehadiran ekstrakurikuler dengan cepat.</h2><p>Scan QR, data masuk ke Google Sheets secara real time, dan rekap otomatis.</p></div><div class="hero-orb">⌁</div></div>
+  <div class="cards"><div class="stat"><span>Jumlah Siswa</span><strong id="statSiswa">0</strong><small>Data aktif/terdaftar</small></div><div class="stat"><span>Absen Hari Ini</span><strong id="statHari">0</strong><small>Hari berjalan</small></div><div class="stat"><span>Minggu Ini</span><strong id="statMinggu">0</strong><small>7 hari terakhir</small></div><div class="stat"><span>Bulan Ini</span><strong id="statBulan">0</strong><small>Bulan berjalan</small></div><div class="stat"><span>Semester Ini</span><strong id="statSemester">0</strong><small>Periode semester</small></div></div>
+  <div class="panel"><div class="panel-head"><h2>Aktivitas Hari Ini</h2><button class="btn" id="refreshBtn">↻ Refresh</button></div><div id="todayList" class="table-wrap"></div></div>
+</section>
+
+<section id="view-siswa" class="view">
+  <div class="panel data-panel">
+    <div class="section-title"><div><span class="eyebrow">DATA SISWA</span><h2>Manajemen Data Siswa</h2><p class="muted">Kelola data, impor Excel, sortir kelas, dan cetak kartu QR.</p></div></div>
+    <div class="data-actions">
+      <a class="action-card" href="template_siswa.xlsx" download><span>▣</span><b>Template Excel</b><small>Unduh format data siswa</small></a>
+      <button class="action-card" id="uploadExcelBtn"><span>⇧</span><b>Upload Excel</b><small>Impor data siswa sekaligus</small></button>
+      <button class="action-card" id="printClassQrBtn"><span>▤</span><b>Cetak Kartu QR</b><small>Cetak sesuai kelas terpilih</small></button>
+      <button class="action-card primary-card" id="addStudentBtn"><span>＋</span><b>Tambah Siswa</b><small>Input satu siswa</small></button>
+      <input id="excelFile" type="file" accept=".xlsx,.xls,.csv" hidden>
+    </div>
+    <div class="filters"><div class="search-box">⌕<input id="studentSearch" placeholder="Cari NIS/NISN, nama siswa, kelas..."></div><label>Sortir Kelas<select id="classFilter"><option value="">Semua Kelas</option></select></label><label>Urutkan<select id="sortStudents"><option value="kelas">Kelas</option><option value="nama">Nama</option><option value="nisn">NIS/NISN</option></select></label></div>
+    <div id="studentTable" class="table-wrap"></div>
+  </div>
+</section>
+
+<section id="view-absen" class="view"><div class="grid-2"><div class="panel scanner-panel"><div class="section-title"><span class="eyebrow">SCAN QR</span><h2>Scan QR Siswa</h2><p class="muted">Arahkan kamera ke QR kartu siswa. Setiap siswa hanya dapat absen 1× per hari.</p></div><div id="reader"></div><button class="btn primary" id="startScan">▶ Mulai Kamera</button><div id="scanResult" class="result"></div></div><div class="panel"><span class="eyebrow">KEGIATAN</span><h2>Pilih Ekstrakurikuler</h2><div id="extraGrid" class="extra-grid"></div><div class="manual-box"><h3>Input QR/NISN manual</h3><div class="row"><input id="manualQr" placeholder="QR_ID atau NIS/NISN"><button class="btn primary" id="manualAttend">Absen</button></div></div></div></div></section>
+
+<section id="view-rekap" class="view"><div class="panel"><div class="panel-head"><div><span class="eyebrow">LAPORAN</span><h2>Rekap Absen</h2></div><div class="tools"><select id="rekapPeriod"><option value="harian">Harian</option><option value="mingguan">Mingguan</option><option value="bulanan">Bulanan</option><option value="semester">Semester</option></select><input type="date" id="rekapDate"><button class="btn primary" id="loadRekap">Tampilkan</button></div></div><div id="rekapTable" class="table-wrap"></div></div></section>
+
+<section id="view-grafik" class="view"><div class="panel"><div class="panel-head"><div><span class="eyebrow">ANALITIK</span><h2>Grafik Absensi</h2></div><select id="chartPeriod"><option value="harian">Harian</option><option value="mingguan">Mingguan</option><option value="bulanan">Bulanan</option><option value="semester">Semester</option></select></div><canvas id="attendanceChart"></canvas></div></section>
+
+<section id="view-pengaturan" class="view"><div class="panel form-panel"><span class="eyebrow">IDENTITAS</span><h2>Pengaturan Sekolah</h2><div class="form-grid"><label>Nama Sekolah<input id="setSchool"></label><label>Nama Kepala Sekolah<input id="setPrincipal"></label><label>NIP Kepala Sekolah<input id="setPrincipalNip"></label><label>Pembina<input id="setPembina"></label><label>Nama Pembina<input id="setPembinaName"></label><label>NIP Pembina<input id="setPembinaNip"></label></div><button class="btn primary" id="saveSettings">Simpan Pengaturan</button></div><div class="panel"><span class="eyebrow">KONEKSI</span><h2>Google Apps Script API</h2><label>URL Web App Google Apps Script (/exec)<input id="apiUrl" placeholder="https://script.google.com/macros/s/.../exec"></label><button class="btn primary" id="saveApi">Simpan URL API</button></div></section>
+</main></div>
+
+<div id="modal" class="modal hidden"><div class="modal-card"><button class="close" id="closeModal">×</button><span class="eyebrow">DATA SISWA</span><h2>Tambah Siswa</h2><div class="form-grid"><label>NIS/NISN<input id="fNisn"></label><label>Nama Siswa<input id="fNama"></label><label>Kelas<input id="fKelas"></label><label>Jenis Kelamin<select id="fJk"><option>L</option><option>P</option></select></label><label>Status<select id="fStatus"><option>Aktif</option><option>Nonaktif</option></select></label></div><button class="btn primary" id="saveStudent">Simpan Siswa</button></div></div>
+<div id="toast"></div><script src="script.js"></script>
+</body></html>
